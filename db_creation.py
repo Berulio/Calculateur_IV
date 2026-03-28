@@ -8,7 +8,7 @@ from pathlib import Path
 # CONSTANTS
 DATA_DIR = Path("data")
 DB_NAME = "pkmn.db"
-LAST_PKMN = 1025
+FIRST_PKMN = 1 # change this index if you want to start the database at an other pokemon index and continue onward.
 
 def db_init() -> sql.Connection: # it returns the db connected.
     """
@@ -56,8 +56,9 @@ def main():
     print("Connexion à la base de données...")
     db = db_init()
 
-    for i in range(1, LAST_PKMN+1): # +1 because range does not include the last bound
-        # rigid but secure way to assign elements
+    isLastPkmn = False
+    i = FIRST_PKMN
+    while not isLastPkmn:
         pkmn = api_manips.api_call(i)
         name = pkmn.name
         stats = pkmn.stats
@@ -65,11 +66,15 @@ def main():
         # but we'll lose a bit on security if we happen to modify 
         # the pokemonData tuple in the future.
         # name, stats = api_manips.api_call(i)
+        
+        if name is None or stats is None:
+            isLastPkmn = True
+        else:
+            add_pkmn(db, stats.bhp, stats.batk, stats.bdef, stats.batkspe, stats.bdefspe, stats.bspd, name, i)
 
-        add_pkmn(db, stats.bhp, stats.batk, stats.bdef, stats.batkspe, stats.bdefspe, stats.bspd, name, i)
-
-        if (i % 100) == 0:
-            db.commit() # periodic save, in case the program crashes, so that we don't lose everything.
+            if (i % 100) == 0:
+                db.commit() # periodic save, in case the program crashes, so that we don't lose everything.
+            i+=1
 
     print("Sauvegarde de la base de données...")
     db.commit()

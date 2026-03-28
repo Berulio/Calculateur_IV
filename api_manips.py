@@ -105,6 +105,8 @@ def main():
     print(pkmn_01.name, pkmn_01.stats)
     pkmn_04 = api_call(4)
     print(pkmn_04.name, pkmn_04.stats)
+    pkmn = api_call(1026) # should not exist, debug purposes
+    print(type(pkmn.name), type(pkmn.stats), pkmn)
     return 0
 
 if __name__ == "__main__":
