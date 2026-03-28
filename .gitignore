@@ -1,0 +1,8 @@
+*.js
+*.csv
+*.db
+*.php
+*__
+data/
+test.py
+dico_fr.py
