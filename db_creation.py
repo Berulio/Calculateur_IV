@@ -4,10 +4,9 @@ import sqlite3 as sql
 import api_manips
 import sys
 from pathlib import Path
+import definitions as df
 
 # CONSTANTS
-DATA_DIR = Path("data")
-DB_NAME = "pkmn.db"
 FIRST_PKMN = 1 # change this index if you want to start the database at an other pokemon index and continue onward.
 
 def db_init() -> sql.Connection: # it returns the db connected.
@@ -16,9 +15,9 @@ def db_init() -> sql.Connection: # it returns the db connected.
         Returns the database object.
     """
     # Creates the ./data directory if it doesn't exist, else does nothing.
-    DATA_DIR.mkdir(parents=False, exist_ok=True)
+    df.DATA_DIR.mkdir(parents=False, exist_ok=True)
 
-    db = sql.connect(DATA_DIR/DB_NAME)
+    db = sql.connect(df.DATA_DIR/df.DB_NAME)
     cursor = db.cursor()
 
     # Create table if it doesn't exist yet, and name it "pokemon"
@@ -70,7 +69,7 @@ def main():
         if name is None or stats is None:
             isLastPkmn = True
         else:
-            add_pkmn(db, stats.bhp, stats.batk, stats.bdef, stats.batkspe, stats.bdefspe, stats.bspd, name, i)
+            add_pkmn(db, stats.hp, stats.atk, stats.dfs, stats.spatk, stats.spdef, stats.spd, name, i)
 
             if (i % 100) == 0:
                 db.commit() # periodic save, in case the program crashes, so that we don't lose everything.

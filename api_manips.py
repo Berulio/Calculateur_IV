@@ -1,29 +1,10 @@
 import requests
 import sys
-from typing import NamedTuple
+import definitions as df
 
 # Constants
 NAME_URL = "https://pokeapi.co/api/v2/pokemon-species/"
 STATS_URL = "https://pokeapi.co/api/v2/pokemon/"
-
-# Definitions
-class PokemonStats(NamedTuple): # in case I want to add new fields in the future? Also, kinda clearer and somehow more secure...and still efficient.
-    """
-        A named tuple to store a pokemon's base stats.
-    """
-    bhp : int
-    batk : int
-    bdef : int
-    batkspe : int
-    bdefspe : int
-    bspd : int
-
-class PokemonData(NamedTuple):
-    """
-        A named tuple to store a pokemon's french name and base stats.
-    """
-    name: str
-    stats: PokemonStats
 
 
 # functions
@@ -54,7 +35,7 @@ def get_french_name(_id: str|int) -> str:
         print("HTTP Error.")
         pass
 
-def get_stats(_id: str|int) -> PokemonStats:
+def get_base_stats(_id: str|int) -> df.PokemonStats:
     """
         Takes a pokemon id (name or number in the national pokedex) and returns its base stats.
         in: pokemon id as a string (english name) or as an integer (number in the national pokedex)
@@ -76,27 +57,27 @@ def get_stats(_id: str|int) -> PokemonStats:
             # using a dictionnary for performance and security.
             raw_data = {entry["stat"]["name"]:entry["base_stat"] for entry in data["stats"]}
             # print(raw_data) # debug
-            return PokemonStats(
-                bhp=raw_data["hp"],
-                batk=raw_data["attack"],
-                bdef=raw_data["defense"],
-                batkspe=raw_data["special-attack"],
-                bdefspe=raw_data["special-defense"],
-                bspd=raw_data["speed"]
+            return df.PokemonStats(
+                hp=raw_data["hp"],
+                atk=raw_data["attack"],
+                dfs=raw_data["defense"],
+                spatk=raw_data["special-attack"],
+                spdef=raw_data["special-defense"],
+                spd=raw_data["speed"]
             )
     except requests.exceptions.HTTPError:
         print("HTTP Error.")
         pass
 
-def api_call(_id) -> PokemonData:
+def api_call(_id) -> df.PokemonData:
     """
-        api_call() will call the function get_french_name and get_stats, then returns
+        api_call() will call the function get_french_name and get_base_stats, then returns
         a named tuple with fields matching the correct data fetched from pokeapi.
         Said data are the pokemon's french name and its base stats.
     """
     pkmn_name = get_french_name(_id)
-    pkmn_stats = get_stats(_id)
-    return PokemonData(name=pkmn_name, stats=pkmn_stats)
+    pkmn_stats = get_base_stats(_id)
+    return df.PokemonData(name=pkmn_name, stats=pkmn_stats)
 
 # Main code
 def main():
