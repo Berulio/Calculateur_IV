@@ -11,24 +11,30 @@ class PokemonStats(NamedTuple): # in case I want to add new fields in the future
     """
         A named tuple to store a pokemon's base stats.
     """
-    hp: int
-    atk: int
-    dfs: int
-    spatk: int
-    spdef: int
-    spd: int
+    hp: int = -1
+    atk: int = -1
+    dfs: int = -1
+    spatk: int = -1
+    spdef: int = -1
+    spd: int = -1
 
 class PokemonIVs(NamedTuple):
     """
-        A named tuple to store a pokemon's IVs.
-        IVs will be calculated "raw" i.e. they will retain their floating point.
+        A named tuple to store a pokemon's IV intervals.
+        IVs will have a low/high range.
     """
-    hp: float
-    atk: float
-    dfs: float
-    spatk: float
-    spdef: float
-    spd: float
+    hp_low: int = -1
+    hp_high: int = -1
+    atk_low: int = -1
+    atk_high: int = -1
+    dfs_low: int = -1
+    dfs_high: int = -1
+    spatk_low: int = -1
+    spatk_high: int = -1
+    spdef_low: int = -1
+    spdef_high: int = -1
+    spd_low: int = -1
+    spd_high: int = -1
 
 class PokemonData(NamedTuple):
     """

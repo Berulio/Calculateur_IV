@@ -49,6 +49,20 @@ def calc_IV(bpkmn: df.PokemonStats, pkmn: df.PokemonStats, lvl: int, nat: str) -
     print(stats_calc_high(lvl, pkmn.atk, bpkmn.atk, float(Nature.NATURE[nat]["atk"])))
     print(hp_calc_low(lvl, pkmn.hp, bpkmn.hp))
     print(hp_calc_high(lvl, pkmn.hp, bpkmn.hp))
+    return df.PokemonIVs(
+        hp_low=hp_calc_low(lvl, pkmn.hp, bpkmn.hp),
+        hp_high=hp_calc_high(lvl, pkmn.hp, bpkmn.hp),
+        atk_low=stats_calc_low(lvl, pkmn.atk, bpkmn.atk, float(Nature.NATURE[nat]["atk"])),
+        atk_high=stats_calc_high(lvl, pkmn.atk, bpkmn.atk, float(Nature.NATURE[nat]["atk"])),
+        dfs_low=stats_calc_low(lvl, pkmn.dfs, bpkmn.dfs, float(Nature.NATURE[nat]["def"])),
+        dfs_high=stats_calc_high(lvl, pkmn.dfs, bpkmn.dfs, float(Nature.NATURE[nat]["def"])),
+        spatk_low=stats_calc_low(lvl, pkmn.spatk, bpkmn.spatk, float(Nature.NATURE[nat]["spatk"])),
+        spatk_high=stats_calc_high(lvl, pkmn.spatk, bpkmn.spatk, float(Nature.NATURE[nat]["spatk"])),
+        spdef_low=stats_calc_low(lvl, pkmn.spdef, bpkmn.spdef, float(Nature.NATURE[nat]["spdef"])),
+        spdef_high=stats_calc_high(lvl, pkmn.spdef, bpkmn.spdef, float(Nature.NATURE[nat]["spdef"])),
+        spd_low=stats_calc_low(lvl, pkmn.spd, bpkmn.spd, float(Nature.NATURE[nat]["spd"])),
+        spd_high=stats_calc_high(lvl, pkmn.spd, bpkmn.spd, float(Nature.NATURE[nat]["spd"]))
+    )
 
 
 
@@ -56,16 +70,20 @@ def calc_IV(bpkmn: df.PokemonStats, pkmn: df.PokemonStats, lvl: int, nat: str) -
 
 # There are no magic numbers. These are the actual formulas
 def hp_calc_low(lvl: int, hp: int, bhp : int, ev : int = 0) -> int:
-    return math.ceil((hp-lvl-10)*(100/lvl)-math.floor(ev/4)-(2*bhp))
+    iv = math.ceil((hp-lvl-10)*(100/lvl)-math.floor(ev/4)-(2*bhp))
+    return 0 if iv < 0 else (31 if iv > 31 else iv) # one-line version
 
 def hp_calc_high(lvl: int, hp: int, bhp : int, ev : int = 0) -> int:
-    return math.ceil((hp-lvl-10+1)*(100/lvl)-math.floor(ev/4)-(2*bhp)-1)
+    iv = math.ceil((hp-lvl-10+1)*(100/lvl)-math.floor(ev/4)-(2*bhp)-1)
+    return max(0, min(31, iv)) # min-max version, more readable but less directly understandable.
 
 def stats_calc_low(lvl: int, stat: int, bstat: int, nat : float, ev : int = 0) -> int:
-    return math.ceil(math.ceil(stat/nat - 5)*100/lvl-math.floor(ev/4)-2*bstat)
+    iv = math.ceil(math.ceil(stat/nat - 5)*100/lvl-math.floor(ev/4)-2*bstat)
+    return 0 if iv < 0 else (31 if iv > 31 else iv)
 
 def stats_calc_high(lvl: int, stat: int, bstat: int, nat : float, ev : int = 0) -> int:
-    return math.ceil((math.ceil((stat+1)/nat - 6)+1)*100/lvl-math.floor(ev/4)-2*bstat-1)
+    iv =  math.ceil((math.ceil((stat+1)/nat - 6)+1)*100/lvl-math.floor(ev/4)-2*bstat-1)
+    return 0 if iv < 0 else (31 if iv > 31 else iv)
     
 
 def main():

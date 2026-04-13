@@ -10,62 +10,65 @@ import calculation as calc
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        # self.pkmn_stats = df.PokemonStats()
+        self.pkmn_ivs = df.PokemonIVs()
+
+        # inputs
+        self.stat_hp_input = QLineEdit()
+        self.stat_atk_input = QLineEdit()
+        self.stat_def_input = QLineEdit()
+        self.stat_spatk_input = QLineEdit()
+        self.stat_spdef_input = QLineEdit()
+        self.stat_spd_input = QLineEdit()
+
+        # output
+        self.iv_hp_output = None
+        self.iv_atk_output = None
+        self.iv_def_output = None
+        self.iv_spatk_output = None
+        self.iv_spdef_output = None
+        self.iv_spd_output = None
+
+
         self.setWindowTitle("Calculateur d'IV")
         self.layoutization()
 
-    def get_stats(self):
+    def get_stats_input(self):
         return df.PokemonStats(
-                hp=int(self.stat_hp.text()),
-                atk=int(self.stat_atk.text()),
-                dfs=int(self.stat_def.text()),
-                spatk=int(self.stat_spatk.text()),
-                spdef=int(self.stat_spdef.text()),
-                spd=int(self.stat_spd.text())
+                hp=int(self.stat_hp_input.text()),
+                atk=int(self.stat_atk_input.text()),
+                dfs=int(self.stat_def_input.text()),
+                spatk=int(self.stat_spatk_input.text()),
+                spdef=int(self.stat_spdef_input.text()),
+                spd=int(self.stat_spd_input.text())
             )
-    
-    def disp(self):
-        print(self.lvlbox.text(),
-              self.selector.currentText(),
-              self.stat_hp.text())
 
     def setup_stats_grid(self):
         grid = QGridLayout()
 
-        self.stat_hp    = QLineEdit()
-        self.stat_atk   = QLineEdit()
-        self.stat_def   = QLineEdit()
-        self.stat_spatk = QLineEdit()
-        self.stat_spdef = QLineEdit()
-        self.stat_spd   = QLineEdit()
-
-        self.stat_hp.setPlaceholderText("HP: 0")
-        self.stat_atk.setPlaceholderText("Atk: 0")
-        self.stat_def.setPlaceholderText("Def: 0")
-        self.stat_spatk.setPlaceholderText("SpAtk: 0")
-        self.stat_spdef.setPlaceholderText("SpDef: 0")
-        self.stat_spd.setPlaceholderText("Spd: 0")
+        self.stat_hp_input.setPlaceholderText("HP: 0")
+        self.stat_atk_input.setPlaceholderText("Atk: 0")
+        self.stat_def_input.setPlaceholderText("Def: 0")
+        self.stat_spatk_input.setPlaceholderText("SpAtk: 0")
+        self.stat_spdef_input.setPlaceholderText("SpDef: 0")
+        self.stat_spd_input.setPlaceholderText("Spd: 0")
 
         # Check if the stats entered are integers within a normal stats range.
         chkstat = QIntValidator(0, 999, self)
-        self.stat_hp.setValidator(chkstat),
-        self.stat_atk.setValidator(chkstat),
-        self.stat_def.setValidator(chkstat),
-        self.stat_spatk.setValidator(chkstat),
-        self.stat_spdef.setValidator(chkstat),
-        self.stat_spd.setValidator(chkstat)
+        self.stat_hp_input.setValidator(chkstat),
+        self.stat_atk_input.setValidator(chkstat),
+        self.stat_def_input.setValidator(chkstat),
+        self.stat_spatk_input.setValidator(chkstat),
+        self.stat_spdef_input.setValidator(chkstat),
+        self.stat_spd_input.setValidator(chkstat)
 
         # addWidget(widget, ligne, colonne)
-        # Ligne 0
-        grid.addWidget(self.stat_hp,    0, 0)
-        grid.addWidget(self.stat_atk,   0, 1)
-        
-        # Ligne 1
-        grid.addWidget(self.stat_def,   1, 0)
-        grid.addWidget(self.stat_spatk, 1, 1)
-        
-        # Ligne 2
-        grid.addWidget(self.stat_spdef, 2, 0)
-        grid.addWidget(self.stat_spd,   2, 1)
+        grid.addWidget(self.stat_hp_input,    0, 0)
+        grid.addWidget(self.stat_atk_input,   1, 0)
+        grid.addWidget(self.stat_def_input,   2, 0)
+        grid.addWidget(self.stat_spatk_input, 3, 0)
+        grid.addWidget(self.stat_spdef_input, 4, 0)
+        grid.addWidget(self.stat_spd_input,   5, 0)
 
         return grid
     
@@ -85,6 +88,45 @@ class MainWindow(QMainWindow):
 
         return self.lvlbox
     
+    def setup_eval_table(self):
+        grid = QGridLayout()
+
+        iv_hp_label    = QLabel("pv")
+        iv_atk_label   = QLabel("atk")
+        iv_def_label   = QLabel("def")
+        iv_spatk_label = QLabel("atk.spe")
+        iv_spdef_label = QLabel("def.spe")
+        iv_spd_label   = QLabel("vit")
+
+        self.iv_hp_output = QLabel(f"{self.pkmn_ivs.hp_low}~{self.pkmn_ivs.hp_high}")
+        self.iv_atk_output = QLabel(f"{self.pkmn_ivs.atk_low}~{self.pkmn_ivs.atk_high}")
+        self.iv_def_output = QLabel(f"{self.pkmn_ivs.dfs_low}~{self.pkmn_ivs.dfs_high}")
+        self.iv_spatk_output = QLabel(f"{self.pkmn_ivs.spatk_low}~{self.pkmn_ivs.spatk_high}")
+        self.iv_spdef_output = QLabel(f"{self.pkmn_ivs.spdef_low}~{self.pkmn_ivs.spdef_high}")
+        self.iv_spd_output = QLabel(f"{self.pkmn_ivs.spd_low}~{self.pkmn_ivs.spd_high}")
+
+        # addWidget(widget, ligne, colonne)
+        grid.addWidget(iv_hp_label,          0, 0)
+        grid.addWidget(self.iv_hp_output,    0, 1)
+        print(f"ID au moment de l'ajout au layout : {id(self.iv_hp_output)}")
+
+        grid.addWidget(iv_atk_label,         1, 0)
+        grid.addWidget(self.iv_atk_output,   1, 1)
+
+        grid.addWidget(iv_def_label,         2, 0)
+        grid.addWidget(self.iv_def_output,   2, 1)
+
+        grid.addWidget(iv_spatk_label,       3, 0)
+        grid.addWidget(self.iv_spatk_output, 3, 1)
+
+        grid.addWidget(iv_spdef_label,       4, 0)
+        grid.addWidget(self.iv_spdef_output, 4, 1)
+
+        grid.addWidget(iv_spd_label,         5, 0)
+        grid.addWidget(self.iv_spd_output,   5, 1)
+
+        return grid
+
     def layoutization(self):
         # Layout 0: Text saying anything
         l0 = QVBoxLayout()
@@ -93,21 +135,20 @@ class MainWindow(QMainWindow):
 
         # Layout 1: Analyzed pokemon stats
         l1 = QVBoxLayout()
-        grid = self.setup_stats_grid()
         l1.addWidget(self.setup_level_box())
         l1.addWidget(self.setup_nature_selector())
-        l1.addLayout(grid)
+        
+        l2 = QHBoxLayout()
+        grid = self.setup_stats_grid()
+        self.iv_eval_grid = self.setup_eval_table()
+        l2.addLayout(grid)
+        l2.addLayout(self.iv_eval_grid)
 
         # layout 2: button to process the stats entered. Basically saying "Hey I'm done entering the stats!"
-        l2 = QVBoxLayout()
+        l3 = QVBoxLayout()
         button = QPushButton("Calculer! :D")
         button.clicked.connect(self.submain)
-        l2.addWidget(button)
-
-        l3 = QHBoxLayout()
-        btn = QPushButton("Voir les stats!")
-        btn.clicked.connect(self.disp)
-        l3.addWidget(btn)
+        l3.addWidget(button)
 
         # Master layout
         ml = QVBoxLayout()
@@ -115,6 +156,7 @@ class MainWindow(QMainWindow):
         ml.addLayout(l1)
         ml.addLayout(l2)
         ml.addLayout(l3)
+        # ml.addLayout(l4)
 
         # master container
         mc = QWidget()
@@ -122,12 +164,24 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(mc)
         self.show()
+
+    def update_display(self):
+        self.iv_hp_output.setText(f"{self.pkmn_ivs.hp_low}~{self.pkmn_ivs.hp_high}")
+        self.iv_atk_output.setText(f"{self.pkmn_ivs.atk_low}~{self.pkmn_ivs.atk_high}")
+        self.iv_def_output.setText(f"{self.pkmn_ivs.dfs_low}~{self.pkmn_ivs.dfs_high}")
+        self.iv_spatk_output.setText(f"{self.pkmn_ivs.spatk_low}~{self.pkmn_ivs.spatk_high}")
+        self.iv_spdef_output.setText(f"{self.pkmn_ivs.spdef_low}~{self.pkmn_ivs.spdef_high}")
+        self.iv_spd_output.setText(f"{self.pkmn_ivs.spd_low}~{self.pkmn_ivs.spd_high}")
+
     
     def submain(self):
         db = calc.db_init()
         lvl = self.lvlbox.value()
         nature = self.selector.currentText()
-        calc.calc_IV(calc.get_base_stat(db, "Carapuce"),self.get_stats(),lvl,nature)
+        self.pkmn_ivs = calc.calc_IV(calc.get_base_stat(db, "Carapuce"),self.get_stats_input(),lvl,nature)
+        self.update_display()
+        print(f"ID au moment du calcul : {id(self.iv_hp_output)}")
+        print(self.pkmn_ivs)
 
 
 def main():
