@@ -6,6 +6,8 @@ from PySide6.QtGui import QIntValidator
 import definitions as df
 import Nature
 import calculation as calc
+import sqlite3 as sql
+import toolz
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -29,7 +31,7 @@ class MainWindow(QMainWindow):
         self.iv_spdef_output = None
         self.iv_spd_output = None
 
-
+        # do stuff
         self.setWindowTitle("Calculateur d'IV")
         self.layoutization()
 
@@ -88,6 +90,27 @@ class MainWindow(QMainWindow):
 
         return self.lvlbox
     
+    def setup_name_box(self):
+        self.namebox = QComboBox()
+        
+        try:
+            db = sql.connect(df.DATA_DIR/df.DB_NAME)
+            cursor = db.cursor()
+
+            cursor.execute("SELECT nom FROM pkmn_table ORDER BY nom ASC")
+            namelist = [item[0] for item in cursor.fetchall()]
+            print(namelist[1])
+            namelist.sort(key=toolz.normalize_name)
+            self.namebox.addItems(namelist)
+            db.close()
+        except Exception as e:
+            print(f"Erreur lors du chargement de la base de données: {e}")
+
+        # set default name to the first one on the list
+        self.namebox.setCurrentIndex(0)
+
+        return self.namebox
+    
     def setup_eval_table(self):
         grid = QGridLayout()
 
@@ -130,11 +153,12 @@ class MainWindow(QMainWindow):
     def layoutization(self):
         # Layout 0: Text saying anything
         l0 = QVBoxLayout()
-        self.blabla = QLabel("Entrez les stats de votre pokémon à évaluer...")
-        l0.addWidget(self.blabla)
+        blabla = QLabel("Entrez les stats de votre pokémon à évaluer...")
+        l0.addWidget(blabla)
 
         # Layout 1: Analyzed pokemon stats
         l1 = QVBoxLayout()
+        l1.addWidget(self.setup_name_box())
         l1.addWidget(self.setup_level_box())
         l1.addWidget(self.setup_nature_selector())
         
@@ -178,7 +202,7 @@ class MainWindow(QMainWindow):
         db = calc.db_init()
         lvl = self.lvlbox.value()
         nature = self.selector.currentText()
-        self.pkmn_ivs = calc.calc_IV(calc.get_base_stat(db, "Carapuce"),self.get_stats_input(),lvl,nature)
+        self.pkmn_ivs = calc.calc_IV(calc.get_base_stat(db, self.namebox.currentText()),self.get_stats_input(),lvl,nature)
         self.update_display()
         print(f"ID au moment du calcul : {id(self.iv_hp_output)}")
         print(self.pkmn_ivs)
