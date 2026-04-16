@@ -3,6 +3,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QWidget, QLineEdit, QGridLayout, QComboBox, QSpinBox
 from PySide6.QtGui import QIntValidator
+from PySide6.QtCore import Qt
 import definitions as df
 import Nature
 import calculation as calc
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # self.pkmn_stats = df.PokemonStats()
+        self.db = calc.db_init()
         self.pkmn_ivs = df.PokemonIVs()
 
         # inputs
@@ -45,7 +47,25 @@ class MainWindow(QMainWindow):
                 spd=int(self.stat_spd_input.text())
             )
 
+    def keyPressEvent(self, event):
+        """
+            Redefines the key press event behavior.
+            When pressing Enter (on numpad) or Return (Enter on main area),
+            the calculator will calculate IVs of stats entered in the input fields.
+            When pressing Escape, the program will close. 
+        """
+        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
+            self.submain()
+        if event.key() == Qt.Key_Escape:
+            self.db.close()
+            self.close()
+        return super().keyPressEvent(event)
+
     def setup_stats_grid(self):
+        """
+            Sets up the stats input fields as a 1x6 grid.
+            These are the stats we will evaluate.
+        """
         grid = QGridLayout()
 
         self.stat_hp_input.setPlaceholderText("HP: 0")
@@ -75,6 +95,11 @@ class MainWindow(QMainWindow):
         return grid
     
     def setup_nature_selector(self):
+        """
+            Sets up a drop-down menu where you can choose the pokemon's nature.
+            By default it is set on a nature that has no modifiers (no impact)
+            on stats.
+        """
         self.selector = QComboBox()
         self.selector.addItems(Nature.NATURE.keys())
 
@@ -84,6 +109,10 @@ class MainWindow(QMainWindow):
         return self.selector
     
     def setup_level_box(self):
+        """
+            Sets up a spin-box menu where you can write (or select using the arrows)
+            the level of the evaluated pokemon. 
+        """
         self.lvlbox = QSpinBox()
         self.lvlbox.setRange(1, 100)
         self.lvlbox.setPrefix("Niveau : ")
@@ -91,6 +120,10 @@ class MainWindow(QMainWindow):
         return self.lvlbox
     
     def setup_name_box(self):
+        """
+            Sets up a drop-down menu where you can select the pokemon to evaluate.
+            By default it is set to the first pokemon sorted in alphabetical order.
+        """
         self.namebox = QComboBox()
         
         try:
@@ -99,7 +132,6 @@ class MainWindow(QMainWindow):
 
             cursor.execute("SELECT nom FROM pkmn_table ORDER BY nom ASC")
             namelist = [item[0] for item in cursor.fetchall()]
-            print(namelist[1])
             namelist.sort(key=toolz.normalize_name)
             self.namebox.addItems(namelist)
             db.close()
@@ -112,6 +144,9 @@ class MainWindow(QMainWindow):
         return self.namebox
     
     def setup_eval_table(self):
+        """
+            Sets up the IV evaluation table next to the input fields.
+        """
         grid = QGridLayout()
 
         iv_hp_label    = QLabel("pv")
@@ -131,7 +166,6 @@ class MainWindow(QMainWindow):
         # addWidget(widget, ligne, colonne)
         grid.addWidget(iv_hp_label,          0, 0)
         grid.addWidget(self.iv_hp_output,    0, 1)
-        print(f"ID au moment de l'ajout au layout : {id(self.iv_hp_output)}")
 
         grid.addWidget(iv_atk_label,         1, 0)
         grid.addWidget(self.iv_atk_output,   1, 1)
@@ -151,6 +185,9 @@ class MainWindow(QMainWindow):
         return grid
 
     def layoutization(self):
+        """
+            Organizes the interface using multiple layouts then a master layout.
+        """
         # Layout 0: Text saying anything
         l0 = QVBoxLayout()
         blabla = QLabel("Entrez les stats de votre pokémon à évaluer...")
@@ -190,6 +227,10 @@ class MainWindow(QMainWindow):
         self.show()
 
     def update_display(self):
+        """
+            Function to refresh the calculted IVs whenever we hit the 
+            Calculate button (or hit Enter).
+        """
         self.iv_hp_output.setText(f"{self.pkmn_ivs.hp_low}~{self.pkmn_ivs.hp_high}")
         self.iv_atk_output.setText(f"{self.pkmn_ivs.atk_low}~{self.pkmn_ivs.atk_high}")
         self.iv_def_output.setText(f"{self.pkmn_ivs.dfs_low}~{self.pkmn_ivs.dfs_high}")
@@ -197,20 +238,24 @@ class MainWindow(QMainWindow):
         self.iv_spdef_output.setText(f"{self.pkmn_ivs.spdef_low}~{self.pkmn_ivs.spdef_high}")
         self.iv_spd_output.setText(f"{self.pkmn_ivs.spd_low}~{self.pkmn_ivs.spd_high}")
 
-    
     def submain(self):
-        db = calc.db_init()
+        """
+            Submain: Where the app becomes alive.
+            We wait for the user to fill in all the fields (YES. 
+            There are no EVs fields for the moment) and proceed to 
+            the computing and refresh the display.
+            Then we close the database.
+        """
         lvl = self.lvlbox.value()
         nature = self.selector.currentText()
-        self.pkmn_ivs = calc.calc_IV(calc.get_base_stat(db, self.namebox.currentText()),self.get_stats_input(),lvl,nature)
+        self.pkmn_ivs = calc.calc_IV(calc.get_base_stat(self.db, self.namebox.currentText()),self.get_stats_input(),lvl,nature)
         self.update_display()
-        print(f"ID au moment du calcul : {id(self.iv_hp_output)}")
-        print(self.pkmn_ivs)
-
 
 def main():
     app = QApplication([])
     window = MainWindow()
+    with open("style.qss", "r") as f:
+        app.setStyleSheet(f.read())
     app.exec()
 
 if __name__ == "__main__":

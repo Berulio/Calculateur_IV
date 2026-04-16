@@ -2,6 +2,7 @@
 # Regarding the purpose of this calculator to me i.e. knowing the IVs
 # of a pokemon I freshly caught/hatched...
 # EVs will have a default value set to 0.
+# IVs will also have a set of low and high bounds after computing.
 
 import sqlite3 as sql
 import sys
@@ -45,10 +46,6 @@ def calc_IV(bpkmn: df.PokemonStats, pkmn: df.PokemonStats, lvl: int, nat: str) -
     """
         Calculate a pokemon IV with its nature taken into account.
     """
-    print(stats_calc_low(lvl, pkmn.atk, bpkmn.atk, float(Nature.NATURE[nat]["atk"])))
-    print(stats_calc_high(lvl, pkmn.atk, bpkmn.atk, float(Nature.NATURE[nat]["atk"])))
-    print(hp_calc_low(lvl, pkmn.hp, bpkmn.hp))
-    print(hp_calc_high(lvl, pkmn.hp, bpkmn.hp))
     return df.PokemonIVs(
         hp_low=hp_calc_low(lvl, pkmn.hp, bpkmn.hp),
         hp_high=hp_calc_high(lvl, pkmn.hp, bpkmn.hp),

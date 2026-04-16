@@ -36,6 +36,7 @@ class PokemonIVs(NamedTuple):
     spd_low: int = -1
     spd_high: int = -1
 
+# this class might be used on a further update.
 class PokemonData(NamedTuple):
     """
         A named tuple to store a pokemon's french name and base stats.

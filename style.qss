@@ -1,0 +1,40 @@
+
+QMainWindow {
+    background-color: #2b5a7a;
+}
+
+QLabel {
+    color: #ffffff;
+    font-size: 14px;
+    font-family: "Kode Mono";
+}
+
+QComboBox {
+    background-color: #2b5a7a;
+    border: 3px solid #8ab;
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    font-family: "Kode Mono";
+}
+
+QComboBox:editable {
+    background: #246;
+}
+
+QLineEdit {
+    font-family: "Kode Mono";
+}
+
+QPushButton {
+    background-color: #e63946;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #f1faee;
+    color: #e63946;
+}
